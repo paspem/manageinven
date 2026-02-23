@@ -1,0 +1,2 @@
+# manageinven
+inven gudang 
