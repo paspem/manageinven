@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIMUMU — Sistem Manajemen Munisi & Materil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Saira:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-emblem">☆</div>
+      <div class="logo-text">
+        <span class="logo-main">SIMUMU</span>
+        <span class="logo-sub">SISTEM MANAJEMEN MATERIL</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">OPERASI</div>
+      <a href="#" class="nav-item active" data-page="dashboard">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        DASHBOARD
+      </a>
+      <a href="#" class="nav-item" data-page="surat">
+        <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        DATA SURAT / PPM
+      </a>
+      <a href="#" class="nav-item" data-page="katalog">
+        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        KATALOG MATERIL
+      </a>
+
+      <div class="nav-section-label" style="margin-top:16px">LAPORAN</div>
+      <a href="#" class="nav-item" data-page="reports">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        REKAP LAPORAN
+      </a>
+      <a href="#" class="nav-item" data-page="ai-chat">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        AI ANALIS
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="status-indicator">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusLabel">LOKAL</span>
+      </div>
+      <div class="db-mode-bar">
+        <span class="db-mode-lbl">DATABASE:</span>
+        <span class="db-mode-val" id="dbModeLabel">localStorage</span>
+        <button class="btn-config-api" onclick="openModal('configAPI')" title="Konfigurasi Google Sheets API">⚙</button>
+      </div>
+      <div class="user-info">
+        <div class="user-avatar">★</div>
+        <div>
+          <div class="user-name">OPERATOR</div>
+          <div class="user-role">ADMIN GUDANG</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <div class="page-title-wrap">
+          <div class="page-breadcrumb">SIMUMU /</div>
+          <h1 class="page-title" id="pageTitle">DASHBOARD</h1>
+        </div>
+      </div>
+      <div class="top-bar-right">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="globalSearch" placeholder="Cari katalog, klien, surat..." oninput="handleGlobalSearch(this.value)">
+        </div>
+        <button class="btn-primary" onclick="openModal('addSurat')">+ TAMBAH SURAT</button>
+      </div>
+    </header>
+
+    <!-- ===== DASHBOARD ===== -->
+    <div id="dashboard" class="page active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-corner"></div>
+          <div class="stat-icon-wrap">📋</div>
+          <div class="stat-body">
+            <div class="stat-val" id="st-surat">0</div>
+            <div class="stat-lbl">TOTAL SURAT/PPM</div>
+          </div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-corner"></div>
+          <div class="stat-icon-wrap">🎯</div>
+          <div class="stat-body">
+            <div class="stat-val" id="st-transaksi">0</div>
+            <div class="stat-lbl">TOTAL ITEM KELUAR</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-corner"></div>
+          <div class="stat-icon-wrap">🏷️</div>
+          <div class="stat-body">
+            <div class="stat-val" id="st-katalog">62</div>
+            <div class="stat-lbl">JENIS KATALOG</div>
+          </div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-corner"></div>
+          <div class="stat-icon-wrap">🏢</div>
+          <div class="stat-body">
+            <div class="stat-val" id="st-klien">0</div>
+            <div class="stat-lbl">TOTAL KLIEN</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="card span-2">
+          <div class="card-header">
+            <h2>TREN PENGELUARAN MATERIL</h2>
+            <div style="display:flex;gap:8px;align-items:center">
+              <select id="chartYear" onchange="renderTrendChart()">
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+              </select>
+              <select id="chartPeriod" onchange="renderTrendChart()">
+                <option value="monthly">BULANAN</option>
+                <option value="quarterly">TRIWULAN</option>
+              </select>
+            </div>
+          </div>
+          <canvas id="trendChart" height="180"></canvas>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h2>DISTRIBUSI GUNA KATEGORI</h2></div>
+          <canvas id="kategoriChart" height="220"></canvas>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="card">
+          <div class="card-header"><h2>SURAT TERBARU</h2></div>
+          <div id="recentSurat"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h2>TOP KATALOG DIGUNAKAN</h2></div>
+          <div id="topKatalog"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== DATA SURAT/PPM ===== -->
+    <div id="surat" class="page">
+      <div class="filters-bar">
+        <div class="filter-group">
+          <label>GUNA KATEGORI:</label>
+          <select id="filterGuna" onchange="renderSuratTable()">
+            <option value="">SEMUA</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>TAHUN:</label>
+          <select id="filterTahun" onchange="renderSuratTable()">
+            <option value="">SEMUA</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>BULAN:</label>
+          <select id="filterBulan" onchange="renderSuratTable()">
+            <option value="">SEMUA</option>
+            <option value="01">JANUARI</option><option value="02">FEBRUARI</option>
+            <option value="03">MARET</option><option value="04">APRIL</option>
+            <option value="05">MEI</option><option value="06">JUNI</option>
+            <option value="07">JULI</option><option value="08">AGUSTUS</option>
+            <option value="09">SEPTEMBER</option><option value="10">OKTOBER</option>
+            <option value="11">NOVEMBER</option><option value="12">DESEMBER</option>
+          </select>
+        </div>
+        <button class="btn-export" onclick="exportSuratCSV()">⬇ EXPORT CSV</button>
+      </div>
+
+      <div class="card table-card">
+        <table class="data-table" id="suratTable">
+          <thead>
+            <tr>
+              <th>NO</th>
+              <th>NO. SURAT</th>
+              <th>NO. PPM</th>
+              <th>NAMA KLIEN</th>
+              <th>KATALOG</th>
+              <th>JENIS BARANG</th>
+              <th>SAT</th>
+              <th>JUMLAH</th>
+              <th>GUNA KATEGORI</th>
+              <th>TGL SURAT</th>
+              <th>AKSI</th>
+            </tr>
+          </thead>
+          <tbody id="suratTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== KATALOG ===== -->
+    <div id="katalog" class="page">
+      <div class="katalog-info-bar">
+        <div class="katalog-info-text">
+          ⚠️ <strong>PERHATIAN:</strong> Kode Katalog dan Nama Barang adalah data baku yang <strong>TIDAK DAPAT DIUBAH</strong>. Hanya Satuan yang dapat diperbarui jika kosong.
+        </div>
+      </div>
+      <div class="card table-card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>NO</th>
+              <th>KODE KATALOG</th>
+              <th>NAMA / JENIS BARANG</th>
+              <th>SATUAN</th>
+              <th>PREFIX</th>
+              <th>TOTAL KELUAR</th>
+              <th>SURAT TERKAIT</th>
+            </tr>
+          </thead>
+          <tbody id="katalogTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== LAPORAN ===== -->
+    <div id="reports" class="page">
+      <div class="report-controls">
+        <div class="report-tabs">
+          <button class="tab-btn active" data-period="bulanan" onclick="switchReport('bulanan', this)">BULANAN</button>
+          <button class="tab-btn" data-period="triwulan" onclick="switchReport('triwulan', this)">TRIWULAN</button>
+          <button class="tab-btn" data-period="tahunan" onclick="switchReport('tahunan', this)">TAHUNAN</button>
+          <button class="tab-btn" data-period="kategori" onclick="switchReport('kategori', this)">PER KATEGORI</button>
+          <button class="tab-btn" data-period="klien" onclick="switchReport('klien', this)">PER KLIEN</button>
+        </div>
+        <div class="report-filters">
+          <select id="rptYear">
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+          </select>
+          <select id="rptMonth">
+            <option value="">SEMUA BULAN</option>
+            <option value="01">JANUARI</option><option value="02">FEBRUARI</option>
+            <option value="03">MARET</option><option value="04">APRIL</option>
+            <option value="05">MEI</option><option value="06">JUNI</option>
+            <option value="07">JULI</option><option value="08">AGUSTUS</option>
+            <option value="09">SEPTEMBER</option><option value="10">OKTOBER</option>
+            <option value="11">NOVEMBER</option><option value="12">DESEMBER</option>
+          </select>
+          <button class="btn-export" onclick="exportReport()">⬇ EXPORT CSV</button>
+        </div>
+      </div>
+
+      <div id="rptSummary" class="report-summary-grid"></div>
+
+      <div class="card">
+        <canvas id="reportChart" height="180"></canvas>
+      </div>
+
+      <div class="card table-card">
+        <table class="data-table">
+          <thead id="rptHead"></thead>
+          <tbody id="rptBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== AI CHAT ===== -->
+    <div id="ai-chat" class="page">
+      <div class="ai-header-card">
+        <div class="ai-badge">AI</div>
+        <div class="ai-title-wrap">
+          <h2>ANALIS INTELIJEN MATERIL</h2>
+          <p>Analisis data pengeluaran, tren, rekap laporan, dan rekomendasi pengadaan</p>
+        </div>
+        <div class="api-key-wrap">
+          <input type="password" id="apiKeyInput" placeholder="API KEY ANTHROPIC..." class="api-input">
+          <button onclick="saveApiKey()" class="btn-save-key">SIMPAN</button>
+        </div>
+      </div>
+
+      <div class="quick-prompts">
+        <button onclick="sendQuick('Berikan analisis lengkap data pengeluaran materil saat ini')">📊 Analisis Data</button>
+        <button onclick="sendQuick('Katalog apa yang paling sering dikeluarkan?')">🎯 Katalog Teratas</button>
+        <button onclick="sendQuick('Klien mana yang paling banyak menerima materil?')">🏢 Top Klien</button>
+        <button onclick="sendQuick('Buat rekapitulasi laporan triwulan')">📋 Rekap Triwulan</button>
+        <button onclick="sendQuick('Prediksi kebutuhan materil berdasarkan tren yang ada')">🔮 Prediksi Kebutuhan</button>
+      </div>
+
+      <div class="chat-box" id="chatBox">
+        <div class="chat-msg ai">
+          <div class="chat-avatar">AI</div>
+          <div class="bubble">Sistem SIMUMU aktif. Saya siap menganalisis data pengeluaran materil Anda — rekap laporan, tren pengeluaran, identifikasi katalog terbanyak, dan rekomendasi pengadaan. Apa yang ingin dianalisis?</div>
+        </div>
+      </div>
+
+      <div class="chat-input-bar">
+        <textarea id="chatInput" placeholder="Ketik pertanyaan tentang data materil..." rows="2" onkeydown="handleKey(event)"></textarea>
+        <button onclick="sendChat()" id="sendBtn" class="btn-send">
+          <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="api.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
