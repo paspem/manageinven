@@ -1,4 +1,4 @@
-# ☆ SIMUMU — Sistem Manajemen Munisi & Materil
+# ☆ SIMUMU — Sistem Manajemen Munisi 
 
 > Sistem manajemen materil militer berbasis web dengan AI Analis terintegrasi (Anthropic Claude). Mengelola data Surat/PPM, 62 Katalog baku, rekap laporan Bulanan/Triwulan/Tahunan/Per Kategori/Per Klien.
 
